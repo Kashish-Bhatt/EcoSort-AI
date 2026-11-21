@@ -36,3 +36,12 @@ Thumbs.db
 *.log
 # Original TACO dataset
 TACO/
+# External datasets
+external_data/
+
+# Large trained model weights
+weights/
+
+# Kaggle exports
+*Final_Export*.zip
+ecosort_v2_kaggle*.zip

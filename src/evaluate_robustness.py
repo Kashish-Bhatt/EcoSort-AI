@@ -20,11 +20,11 @@ DETECTION_DIR.mkdir(parents=True, exist_ok=True)
 SEGMENTATION_DIR.mkdir(parents=True, exist_ok=True)
 
 DETECTION_MODEL = (
-    ROOT / "weights" / "exp2_yolo11s_960_best.pt"
+    ROOT / "weights" / "ecosort_v2_detection_best.pt"
 )
 
 SEGMENTATION_MODEL = (
-    ROOT / "weights" / "ecosort_segmentation_best.pt"
+    ROOT / "weights" / "ecosort_v2_segmentation_best.pt"
 )
 
 CLASS_NAMES = {

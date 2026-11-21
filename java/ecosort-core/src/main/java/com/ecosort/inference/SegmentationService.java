@@ -49,7 +49,7 @@ public class SegmentationService {
 
         segmentationModel =
                 projectRoot.resolve(
-                        "weights/ecosort_segmentation_best.pt"
+                        "weights/ecosort_v2_segmentation_best.pt"
                 );
 
         objectMapper =

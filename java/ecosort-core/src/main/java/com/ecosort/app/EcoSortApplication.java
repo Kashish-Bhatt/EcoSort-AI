@@ -176,7 +176,7 @@ public class EcoSortApplication extends Application {
 
         Label version =
                 new Label(
-                        "EcoSort AI v1.0"
+                        "EcoSort AI • Model V2"
                 );
 
         version.setStyle(

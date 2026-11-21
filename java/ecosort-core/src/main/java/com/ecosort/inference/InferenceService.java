@@ -65,7 +65,7 @@ public class InferenceService {
 
         modelPath =
                 projectRoot.resolve(
-                        "weights/exp2_yolo11s_960_best.pt"
+                        "weights/ecosort_v2_detection_best.pt"
                 );
 
 

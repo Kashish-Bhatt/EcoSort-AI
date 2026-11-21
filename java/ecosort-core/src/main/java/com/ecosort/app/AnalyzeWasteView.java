@@ -183,8 +183,8 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         setStyle(
-                "-fx-background: #F4F7F5;"
-                        + "-fx-background-color: #F4F7F5;"
+                "-fx-background: #F1F7F2;"
+                        + "-fx-background-color: #F1F7F2;"
                         + "-fx-border-color: transparent;"
         );
     }
@@ -198,6 +198,10 @@ public class AnalyzeWasteView extends ScrollPane {
 
         HBox header =
                 createHeader();
+
+
+        HBox ecoBanner =
+                createEcoBanner();
 
 
         StackPane uploadCard =
@@ -235,8 +239,9 @@ public class AnalyzeWasteView extends ScrollPane {
 
         VBox content =
                 new VBox(
-                        16,
+                        18,
                         header,
+                        ecoBanner,
                         uploadCard,
                         resultCards,
                         modelDecisionPanel,
@@ -249,16 +254,16 @@ public class AnalyzeWasteView extends ScrollPane {
 
         content.setPadding(
                 new Insets(
-                        24,
                         28,
-                        25,
-                        28
+                        34,
+                        32,
+                        34
                 )
         );
 
 
         content.setStyle(
-                "-fx-background-color: #F4F7F5;"
+                "-fx-background-color: #F1F7F2;"
         );
 
 
@@ -274,27 +279,26 @@ public class AnalyzeWasteView extends ScrollPane {
 
         Label title =
                 new Label(
-                        "Waste Analysis Dashboard"
+                        "EcoSort Intelligence Dashboard"
                 );
 
 
         title.setStyle(
-                "-fx-font-size: 26px;"
+                "-fx-font-size: 30px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #143B30;"
+                        + "-fx-text-fill: #123D2D;"
         );
 
 
         Label subtitle =
                 new Label(
-                        "Upload an image to detect recyclable materials "
-                                + "and evaluate recycling quality"
+                        "AI-powered recyclable material detection, segmentation and recycling quality assessment"
                 );
 
 
         subtitle.setStyle(
-                "-fx-font-size: 12px;"
-                        + "-fx-text-fill: #6A7D76;"
+                "-fx-font-size: 13px;"
+                        + "-fx-text-fill: #5E756B;"
         );
 
 
@@ -340,6 +344,59 @@ public class AnalyzeWasteView extends ScrollPane {
     }
 
 
+    private HBox createEcoBanner() {
+
+        Label leaf = new Label("❧");
+        leaf.setStyle(
+                "-fx-font-size: 34px;"
+                        + "-fx-text-fill: #D7F3E1;"
+        );
+
+        Label heading = new Label(
+                "Smarter sorting. Cleaner recycling."
+        );
+        heading.setStyle(
+                "-fx-font-size: 18px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: white;"
+        );
+
+        Label text = new Label(
+                "Detection + instance segmentation + cross-model verification"
+        );
+        text.setStyle(
+                "-fx-font-size: 11px;"
+                        + "-fx-text-fill: #D8EEE2;"
+        );
+
+        VBox copy = new VBox(3, heading, text);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label version = new Label("ECOSORT V2  •  4 MATERIAL CLASSES");
+        version.setStyle(
+                "-fx-background-color: rgba(255,255,255,0.14);"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-padding: 8 13;"
+                        + "-fx-background-radius: 16;"
+        );
+
+        HBox banner = new HBox(14, leaf, copy, spacer, version);
+        banner.setAlignment(Pos.CENTER_LEFT);
+        banner.setPadding(new Insets(16, 20, 16, 20));
+        banner.setStyle(
+                "-fx-background-color: linear-gradient(to right, #123F2D, #1F7652);"
+                        + "-fx-background-radius: 16;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(20,70,48,0.14), 16, 0.15, 0, 4);"
+        );
+
+        return banner;
+    }
+
+
     // =========================================================
     // UPLOAD CARD
     // =========================================================
@@ -372,12 +429,12 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         card.setMinHeight(
-                220
+                270
         );
 
 
         card.setPrefHeight(
-                220
+                270
         );
 
 
@@ -387,10 +444,11 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         card.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-background-radius: 14;"
-                        + "-fx-border-color: #D7E3DE;"
-                        + "-fx-border-radius: 14;"
+                "-fx-background-color: linear-gradient(to bottom right, #FFFFFF, #F5FBF6);"
+                        + "-fx-background-radius: 18;"
+                        + "-fx-border-color: #CFE3D7;"
+                        + "-fx-border-radius: 18;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(20,70,48,0.10), 18, 0.15, 0, 5);"
         );
 
 
@@ -483,19 +541,19 @@ public class AnalyzeWasteView extends ScrollPane {
 
         Label icon =
                 new Label(
-                        "♻"
+                        "♻  ECO"
                 );
 
 
         icon.setStyle(
-                "-fx-font-size: 38px;"
-                        + "-fx-text-fill: #23785A;"
+                "-fx-font-size: 34px;"
+                        + "-fx-text-fill: #1B7A50;"
         );
 
 
         Label title =
                 new Label(
-                        "Upload a waste image"
+                        "Drop a waste image to begin"
                 );
 
 
@@ -508,14 +566,14 @@ public class AnalyzeWasteView extends ScrollPane {
 
         Label text =
                 new Label(
-                        "Drag and drop a JPG, JPEG or PNG image "
+                        "Drag & drop a JPG, JPEG or PNG image "
                                 + "here, or select one from your computer."
                 );
 
 
         text.setStyle(
-                "-fx-font-size: 11px;"
-                        + "-fx-text-fill: #71837C;"
+                "-fx-font-size: 12px;"
+                        + "-fx-text-fill: #61766D;"
         );
 
 
@@ -566,12 +624,12 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         imagePreview.setFitWidth(
-                390
+                470
         );
 
 
         imagePreview.setFitHeight(
-                180
+                215
         );
 
 
@@ -598,29 +656,31 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         imageContainer.setPrefWidth(
-                430
+                500
         );
 
 
         imageContainer.setMinWidth(
-                360
+                420
         );
 
 
         imageContainer.setStyle(
-                "-fx-background-color: #EDF2EF;"
-                        + "-fx-background-radius: 10;"
+                "-fx-background-color: #E7F2EA;"
+                        + "-fx-background-radius: 14;"
+                        + "-fx-border-color: #C8DDD0;"
+                        + "-fx-border-radius: 14;"
         );
 
 
         Label readyLabel =
                 new Label(
-                        "IMAGE READY"
+                        "●  IMAGE READY"
                 );
 
 
         readyLabel.setStyle(
-                "-fx-text-fill: #1F7857;"
+                "-fx-text-fill: #16794B;"
                         + "-fx-font-size: 10px;"
                         + "-fx-font-weight: bold;"
         );
@@ -628,7 +688,7 @@ public class AnalyzeWasteView extends ScrollPane {
 
         Label title =
                 new Label(
-                        "Ready for EcoSort analysis"
+                        "Ready for intelligent waste analysis"
                 );
 
 
@@ -2365,11 +2425,11 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         button.setStyle(
-                "-fx-background-color: #1F7657;"
+                "-fx-background-color: linear-gradient(to right, #176B46, #23945F);"
                         + "-fx-text-fill: white;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-padding: 10 20;"
-                        + "-fx-background-radius: 8;"
+                        + "-fx-padding: 11 22;"
+                        + "-fx-background-radius: 10;"
                         + "-fx-cursor: hand;"
         );
 
@@ -2392,11 +2452,11 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         button.setStyle(
-                "-fx-background-color: #E8EFEC;"
-                        + "-fx-text-fill: #315A4A;"
+                "-fx-background-color: #E5F0E9;"
+                        + "-fx-text-fill: #24563F;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-padding: 10 17;"
-                        + "-fx-background-radius: 8;"
+                        + "-fx-padding: 11 18;"
+                        + "-fx-background-radius: 10;"
                         + "-fx-cursor: hand;"
         );
 
@@ -2424,9 +2484,9 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         label.setStyle(
-                "-fx-font-size: 20px;"
+                "-fx-font-size: 22px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #173D30;"
+                        + "-fx-text-fill: #123D2D;"
         );
 
 
@@ -2503,10 +2563,11 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         card.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-border-color: #DCE5E1;"
-                        + "-fx-border-radius: 12;"
+                "-fx-background-color: #FFFFFF;"
+                        + "-fx-background-radius: 15;"
+                        + "-fx-border-color: #D4E5DA;"
+                        + "-fx-border-radius: 15;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(20,70,48,0.07), 12, 0.12, 0, 3);"
         );
 
 
@@ -2538,10 +2599,11 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         panel.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-border-color: #DCE5E1;"
-                        + "-fx-border-radius: 12;"
+                "-fx-background-color: #FFFFFF;"
+                        + "-fx-background-radius: 15;"
+                        + "-fx-border-color: #D4E5DA;"
+                        + "-fx-border-radius: 15;"
+                        + "-fx-effect: dropshadow(gaussian, rgba(20,70,48,0.07), 12, 0.12, 0, 3);"
         );
 
 
@@ -2563,9 +2625,9 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         label.setStyle(
-                "-fx-font-size: 15px;"
+                "-fx-font-size: 16px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #233C33;"
+                        + "-fx-text-fill: #173F30;"
         );
 
 
@@ -2592,8 +2654,8 @@ public class AnalyzeWasteView extends ScrollPane {
 
 
         label.setStyle(
-                "-fx-font-size: 11px;"
-                        + "-fx-text-fill: #71837C;"
+                "-fx-font-size: 12px;"
+                        + "-fx-text-fill: #61766D;"
         );
 
 

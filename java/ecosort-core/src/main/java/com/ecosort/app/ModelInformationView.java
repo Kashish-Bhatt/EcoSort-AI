@@ -14,29 +14,27 @@ public class ModelInformationView extends VBox {
         setPadding(new Insets(28));
 
         setStyle(
-                "-fx-background-color: #F4F7F5;"
+                "-fx-background-color: #F2F7F3;"
         );
 
         Label title =
-                new Label(
-                        "Model Information"
-                );
+                new Label("Model Information");
 
         title.setStyle(
-                "-fx-font-size: 26px;"
+                "-fx-font-size: 28px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #143B30;"
+                        + "-fx-text-fill: #0E4938;"
         );
 
         Label subtitle =
                 new Label(
-                        "Final EcoSort deep-learning architecture, "
-                                + "dataset and evaluation performance"
+                        "EcoSort V2 • Deep-learning architecture, "
+                                + "dataset and held-out evaluation"
                 );
 
         subtitle.setStyle(
                 "-fx-font-size: 12px;"
-                        + "-fx-text-fill: #6A7D76;"
+                        + "-fx-text-fill: #668078;"
         );
 
         VBox heading =
@@ -56,16 +54,16 @@ public class ModelInformationView extends VBox {
 
         VBox detector =
                 createMetricCard(
-                        "DETECTION",
+                        "DETECTOR",
                         "YOLO11s",
-                        "960 x 960 object detection"
+                        "960 px object detection"
                 );
 
         VBox segmenter =
                 createMetricCard(
-                        "SEGMENTATION",
+                        "SEGMENTER",
                         "YOLO11s-seg",
-                        "640 x 640 instance segmentation"
+                        "640 px instance segmentation"
                 );
 
         VBox classes =
@@ -77,17 +75,20 @@ public class ModelInformationView extends VBox {
 
         VBox modelState =
                 createMetricCard(
-                        "STATUS",
-                        "Trained",
-                        "Final weights available locally"
+                        "MODEL",
+                        "EcoSort V2",
+                        "Expanded-data experiment"
                 );
 
-        for (VBox card : new VBox[]{
-                detector,
-                segmenter,
-                classes,
-                modelState
-        }) {
+        for (
+                VBox card :
+                new VBox[]{
+                        detector,
+                        segmenter,
+                        classes,
+                        modelState
+                }
+        ) {
 
             HBox.setHgrow(
                     card,
@@ -109,144 +110,121 @@ public class ModelInformationView extends VBox {
 
         VBox dataset =
                 createPanel(
-                        "Dataset",
-                        "EcoSort segmentation dataset: 1,407 images\n"
-                                + "Annotated waste instances: 3,414\n"
-                                + "Training images: 976\n"
-                                + "Validation images: 212\n"
-                                + "Test images: 219\n\n"
-                                + "Supported material classes:\n"
-                                + "Plastic, Metal, Glass and Paper/Cardboard.\n\n"
-                                + "The held-out test split is used for "
-                                + "final evaluation and is not used for training."
+                        "Dataset & Preparation",
+
+                        "Version 1 source: TACO "
+                                + "(Trash Annotations in Context)\n"
+                                + "Version 2 expansion: Segmented TrashNet\n\n"
+
+                                + "V2 training images: 2,636\n"
+                                + "V2 training annotations: 4,120\n"
+                                + "Validation images: 675\n"
+                                + "Validation annotations: 956\n"
+                                + "Held-out test images: 219\n"
+                                + "Held-out test annotations: 488\n\n"
+
+                                + "Supported classes: Plastic, Metal, Glass "
+                                + "and Paper/Cardboard.\n\n"
+
+                                + "The original 219-image test set was kept "
+                                + "unchanged between V1 and V2 so both "
+                                + "versions could be compared on the same data."
                 );
 
 
         // =====================================================
-        // DETECTOR PERFORMANCE
+        // DETECTION RESULTS
         // =====================================================
 
-        VBox detectorPerformance =
+        VBox detection =
                 createPanel(
-                        "Final Detection Performance — Held-Out Test Set",
-                        "Model: YOLO11s\n"
-                                + "Input resolution: 960 x 960\n"
-                                + "Test images: 219\n"
-                                + "Test instances: 488\n\n"
-                                + "Precision: 47.8%\n"
-                                + "Recall: 30.1%\n"
-                                + "mAP@50: 26.6%\n"
-                                + "mAP@50-95: 20.2%\n\n"
-                                + "CPU inference: approximately 760.5 ms/image\n"
-                                + "End-to-end throughput: approximately 1.29 FPS"
+                        "V2 Detection — Held-Out Test Results",
+
+                        "Model: YOLO11s @ 960 px\n\n"
+
+                                + "Precision: 35.14%\n"
+                                + "Recall: 36.39%\n"
+                                + "mAP@50: 32.20%\n"
+                                + "mAP@50–95: 25.38%\n\n"
+
+                                + "V1 → V2 comparison\n"
+                                + "mAP@50: 26.60% → 32.20%\n"
+                                + "mAP@50–95: 20.20% → 25.38%\n"
+                                + "Recall: 30.10% → 36.39%\n\n"
+
+                                + "V2 improved recall and both mAP metrics, "
+                                + "while precision decreased. This represents "
+                                + "a measurable precision–recall trade-off."
                 );
 
 
         // =====================================================
-        // DETECTOR CLASS PERFORMANCE
-        // =====================================================
-
-        VBox classPerformance =
-                createPanel(
-                        "Detection Performance by Material",
-                        "Plastic\n"
-                                + "mAP@50: 31.9%   |   mAP@50-95: 23.7%\n\n"
-                                + "Metal\n"
-                                + "mAP@50: 45.9%   |   mAP@50-95: 36.9%\n\n"
-                                + "Glass\n"
-                                + "mAP@50: 1.08%   |   mAP@50-95: 0.82%\n\n"
-                                + "Paper/Cardboard\n"
-                                + "mAP@50: 27.5%   |   mAP@50-95: 19.4%\n\n"
-                                + "Glass is the weakest class in the "
-                                + "held-out evaluation and is treated as "
-                                + "an identified model limitation."
-                );
-
-
-        // =====================================================
-        // SEGMENTATION PERFORMANCE
+        // SEGMENTATION RESULTS
         // =====================================================
 
         VBox segmentation =
                 createPanel(
-                        "Final Instance Segmentation Performance",
-                        "Model: YOLO11s-seg\n"
-                                + "Input resolution: 640 x 640\n"
-                                + "Test images: 219\n"
-                                + "Test instances: 488\n\n"
-                                + "Mask Precision: 32.4%\n"
-                                + "Mask Recall: 32.4%\n"
-                                + "Mask mAP@50: 21.0%\n"
-                                + "Mask mAP@50-95: 14.5%\n\n"
-                                + "The segmentation masks are used to "
-                                + "calculate pixel-area material composition, "
-                                + "purity and contamination."
+                        "V2 Instance Segmentation — Held-Out Test Results",
+
+                        "Model: YOLO11s-seg @ 640 px\n\n"
+
+                                + "Mask Precision: 38.7%\n"
+                                + "Mask Recall: 31.2%\n"
+                                + "Mask mAP@50: 29.4%\n"
+                                + "Mask mAP@50–95: 20.2%\n\n"
+
+                                + "V1 → V2 comparison\n"
+                                + "Mask mAP@50: 21.0% → 29.4%\n"
+                                + "Mask mAP@50–95: 14.5% → 20.2%"
                 );
 
 
         // =====================================================
-        // IoU
+        // IOU
         // =====================================================
 
         VBox iou =
                 createPanel(
-                        "Segmentation IoU Evaluation",
-                        "Plastic IoU: 46.98%\n"
-                                + "Metal IoU: 45.53%\n"
-                                + "Glass IoU: 3.37%\n"
-                                + "Paper/Cardboard IoU: 19.82%\n\n"
-                                + "Mean Class IoU: 28.92%\n"
-                                + "Global IoU: 39.71%\n"
-                                + "Mean Image IoU: 37.47%\n\n"
-                                + "IoU evaluation throughput: approximately "
-                                + "2.07 FPS on CPU."
+                        "Segmentation IoU Analysis",
+
+                        "Plastic IoU: 53.74%\n"
+                                + "Metal IoU: 34.71%\n"
+                                + "Glass IoU: 1.80%\n"
+                                + "Paper/Cardboard IoU: 21.48%\n\n"
+
+                                + "Mean Class IoU: 27.93%\n"
+                                + "Global IoU: 42.17%\n"
+                                + "Mean Image IoU: 42.48%\n\n"
+
+                                + "Average local segmentation inference: "
+                                + "584.18 ms\n"
+                                + "Measured throughput: 1.71 FPS"
                 );
 
 
         // =====================================================
-        // BASELINE COMPARISON
+        // ERROR ANALYSIS
         // =====================================================
 
-        VBox comparison =
+        VBox limitations =
                 createPanel(
-                        "Detection Baseline Comparison",
-                        "YOLO11n @ 640\n"
-                                + "Precision: 38.5%\n"
-                                + "Recall: 34.2%\n"
-                                + "mAP@50: 30.6%\n"
-                                + "mAP@50-95: 19.4%\n\n"
-                                + "YOLO11s @ 960 — Final Detector\n"
-                                + "Precision: 47.8%\n"
-                                + "Recall: 30.1%\n"
-                                + "mAP@50: 26.6%\n"
-                                + "mAP@50-95: 20.2%\n\n"
-                                + "The larger YOLO11s configuration improved "
-                                + "precision and mAP@50-95, while the smaller "
-                                + "baseline retained higher recall and mAP@50."
-                );
+                        "Error Analysis & Limitations",
 
+                        "Glass remains the weakest material class. "
+                                + "Transparent surfaces, reflections, limited "
+                                + "class diversity and domain differences "
+                                + "make Glass difficult to recognize reliably.\n\n"
 
-        // =====================================================
-        // SAFETY / DECISION FUSION
-        // =====================================================
+                                + "Dataset expansion improved overall detection "
+                                + "and segmentation mAP, Global IoU and Mean "
+                                + "Image IoU, but improvements were not uniform "
+                                + "across every class.\n\n"
 
-        VBox safety =
-                createPanel(
-                        "Cross-Model Verification",
-                        "EcoSort combines object detection and instance "
-                                + "segmentation before publishing the final "
-                                + "material decision.\n\n"
-                                + "If both models agree with sufficient "
-                                + "confidence, the supported material result "
-                                + "is displayed.\n\n"
-                                + "Low-confidence predictions, missing "
-                                + "segmentation regions or disagreement between "
-                                + "the detection and segmentation models are "
-                                + "flagged for MANUAL REVIEW.\n\n"
-                                + "This safety layer reduces unsupported "
-                                + "automatic recycling decisions but is not "
-                                + "a substitute for full open-set or "
-                                + "out-of-distribution recognition."
+                                + "EcoSort is a closed-set four-class system. "
+                                + "Unsupported or ambiguous waste may still be "
+                                + "mapped to a known class. Cross-model "
+                                + "verification therefore sends unreliable or "
+                                + "disagreeing predictions to MANUAL REVIEW."
                 );
 
 
@@ -257,39 +235,47 @@ public class ModelInformationView extends VBox {
         VBox architecture =
                 createPanel(
                         "Application Architecture",
-                        "JavaFX desktop interface\n"
-                                + "Java analysis, quality and history services\n"
-                                + "Python / Ultralytics inference engine\n"
-                                + "YOLO11s object detection\n"
+
+                        "Waste image\n"
+                                + "↓\n"
+                                + "YOLO11s object detection + "
                                 + "YOLO11s-seg instance segmentation\n"
-                                + "Semantic material maps derived from masks\n"
-                                + "Pixel-area purity and contamination analysis\n"
-                                + "Cross-model decision verification\n"
-                                + "JSON-based Java ↔ Python communication\n"
-                                + "Persistent analysis history"
+                                + "↓\n"
+                                + "Cross-model decision fusion\n"
+                                + "↓\n"
+                                + "Material composition, purity and contamination\n"
+                                + "↓\n"
+                                + "Recycling recommendation / Manual Review\n\n"
+
+                                + "Python + Ultralytics perform inference.\n"
+                                + "Java services launch the Python pipelines "
+                                + "and receive JSON results.\n"
+                                + "JavaFX provides the desktop interface and "
+                                + "analysis-history workflow."
                 );
 
 
         // =====================================================
-        // LIMITATIONS
+        // TECHNICAL COMPONENTS
         // =====================================================
 
-        VBox limitations =
+        VBox technical =
                 createPanel(
-                        "Current Model Limitations",
-                        "EcoSort is trained for four recyclable material "
-                                + "classes only: Plastic, Metal, Glass and "
-                                + "Paper/Cardboard.\n\n"
-                                + "Unsupported materials such as organic waste, "
-                                + "textiles and electronic waste are outside the "
-                                + "trained class set.\n\n"
-                                + "Performance is weaker for Glass and difficult "
-                                + "conditions such as clutter, small objects, "
-                                + "occlusion and unusual lighting.\n\n"
-                                + "Future work includes additional balanced "
-                                + "training data, more Glass examples, difficult "
-                                + "real-world scenes and explicit unknown-material "
-                                + "or open-set recognition."
+                        "Deep-Learning Components",
+
+                        "Transfer learning • CNN-based detection • "
+                                + "Instance segmentation • Semantic material maps\n\n"
+
+                                + "MLP • Forward propagation • Backpropagation • "
+                                + "Gradient checking • Tensor operations • SVD\n\n"
+
+                                + "Optimization • Regularization • Dropout • "
+                                + "Hebbian learning • Competitive learning • "
+                                + "Error-correction learning\n\n"
+
+                                + "2D and multi-channel convolution • "
+                                + "LSTM sequence modelling • "
+                                + "Variational Autoencoder and latent space"
                 );
 
 
@@ -297,14 +283,12 @@ public class ModelInformationView extends VBox {
                 heading,
                 summary,
                 dataset,
-                detectorPerformance,
-                classPerformance,
+                detection,
                 segmentation,
                 iou,
-                comparison,
-                safety,
+                limitations,
                 architecture,
-                limitations
+                technical
         );
     }
 
@@ -320,18 +304,16 @@ public class ModelInformationView extends VBox {
         h.setStyle(
                 "-fx-font-size: 10px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #71847C;"
+                        + "-fx-text-fill: #6D8179;"
         );
 
         Label v =
                 new Label(value);
 
-        v.setWrapText(true);
-
         v.setStyle(
                 "-fx-font-size: 20px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #173D30;"
+                        + "-fx-text-fill: #0E4938;"
         );
 
         Label d =
@@ -341,7 +323,7 @@ public class ModelInformationView extends VBox {
 
         d.setStyle(
                 "-fx-font-size: 10px;"
-                        + "-fx-text-fill: #899890;"
+                        + "-fx-text-fill: #87978F;"
         );
 
         VBox card =
@@ -353,7 +335,7 @@ public class ModelInformationView extends VBox {
                 );
 
         card.setPadding(
-                new Insets(16)
+                new Insets(17)
         );
 
         card.setMinHeight(115);
@@ -361,9 +343,12 @@ public class ModelInformationView extends VBox {
 
         card.setStyle(
                 "-fx-background-color: white;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-border-color: #DCE5E1;"
-                        + "-fx-border-radius: 12;"
+                        + "-fx-background-radius: 14;"
+                        + "-fx-border-color: #D5E4DC;"
+                        + "-fx-border-radius: 14;"
+                        + "-fx-effect: dropshadow("
+                        + "gaussian, rgba(20,70,50,0.08), "
+                        + "10, 0, 0, 3);"
         );
 
         return card;
@@ -378,9 +363,9 @@ public class ModelInformationView extends VBox {
                 new Label(title);
 
         heading.setStyle(
-                "-fx-font-size: 15px;"
+                "-fx-font-size: 16px;"
                         + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: #233C33;"
+                        + "-fx-text-fill: #123F32;"
         );
 
         Label body =
@@ -390,26 +375,29 @@ public class ModelInformationView extends VBox {
 
         body.setStyle(
                 "-fx-font-size: 12px;"
-                        + "-fx-text-fill: #687A73;"
+                        + "-fx-text-fill: #61766D;"
                         + "-fx-line-spacing: 3;"
         );
 
         VBox panel =
                 new VBox(
-                        8,
+                        9,
                         heading,
                         body
                 );
 
         panel.setPadding(
-                new Insets(18)
+                new Insets(20)
         );
 
         panel.setStyle(
                 "-fx-background-color: white;"
-                        + "-fx-background-radius: 12;"
-                        + "-fx-border-color: #DCE5E1;"
-                        + "-fx-border-radius: 12;"
+                        + "-fx-background-radius: 14;"
+                        + "-fx-border-color: #D7E5DE;"
+                        + "-fx-border-radius: 14;"
+                        + "-fx-effect: dropshadow("
+                        + "gaussian, rgba(20,70,50,0.06), "
+                        + "9, 0, 0, 2);"
         );
 
         return panel;

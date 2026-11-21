@@ -21,7 +21,7 @@ def main():
     parser.add_argument("--image", required=True)
     parser.add_argument(
         "--model",
-        default="weights/ecosort_segmentation_best.pt"
+       default="weights/ecosort_v2_segmentation_best.pt"
     )
     parser.add_argument("--confidence", type=float, default=0.25)
     parser.add_argument("--imgsz", type=int, default=640)
