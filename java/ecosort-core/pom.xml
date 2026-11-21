@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+         http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ================================================== -->
+    <!-- PROJECT INFORMATION -->
+    <!-- ================================================== -->
+
+    <groupId>com.ecosort</groupId>
+    <artifactId>ecosort-core</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>EcoSort AI</name>
+
+    <description>
+        Deep Learning based Waste Sorting and Recycling Quality Controller
+    </description>
+
+
+    <!-- ================================================== -->
+    <!-- PROJECT SETTINGS -->
+    <!-- ================================================== -->
+
+    <properties>
+
+        <project.build.sourceEncoding>
+            UTF-8
+        </project.build.sourceEncoding>
+
+        <maven.compiler.release>
+            17
+        </maven.compiler.release>
+
+        <junit.version>
+            5.11.0
+        </junit.version>
+
+        <nd4j.version>
+            1.0.0-M2.1
+        </nd4j.version>
+
+        <javafx.version>
+            21.0.5
+        </javafx.version>
+
+    </properties>
+
+
+    <!-- ================================================== -->
+    <!-- DEPENDENCY MANAGEMENT -->
+    <!-- ================================================== -->
+
+    <dependencyManagement>
+
+        <dependencies>
+
+            <dependency>
+
+                <groupId>
+                    org.junit
+                </groupId>
+
+                <artifactId>
+                    junit-bom
+                </artifactId>
+
+                <version>
+                    ${junit.version}
+                </version>
+
+                <type>
+                    pom
+                </type>
+
+                <scope>
+                    import
+                </scope>
+
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+
+    <!-- ================================================== -->
+    <!-- DEPENDENCIES -->
+    <!-- ================================================== -->
+
+    <dependencies>
+    <!-- ============================================== -->
+    <!-- JACKSON -->
+    <!-- JSON parsing for Python AI inference results -->
+    <!-- ============================================== -->
+
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.18.2</version>
+    </dependency>
+
+
+
+        <!-- ================================================= -->
+        <!-- ND4J -->
+        <!-- Tensor mathematics -->
+        <!-- ================================================= -->
+
+        <dependency>
+
+            <groupId>
+                org.nd4j
+            </groupId>
+
+            <artifactId>
+                nd4j-native-platform
+            </artifactId>
+
+            <version>
+                ${nd4j.version}
+            </version>
+
+        </dependency>
+
+
+        <!-- ================================================= -->
+        <!-- JAVAFX CONTROLS -->
+        <!-- Buttons, labels, charts, layouts etc. -->
+        <!-- ================================================= -->
+
+        <dependency>
+
+            <groupId>
+                org.openjfx
+            </groupId>
+
+            <artifactId>
+                javafx-controls
+            </artifactId>
+
+            <version>
+                ${javafx.version}
+            </version>
+
+        </dependency>
+
+
+        <!-- ================================================= -->
+        <!-- JAVAFX FXML -->
+        <!-- GUI layout support -->
+        <!-- ================================================= -->
+
+        <dependency>
+
+            <groupId>
+                org.openjfx
+            </groupId>
+
+            <artifactId>
+                javafx-fxml
+            </artifactId>
+
+            <version>
+                ${javafx.version}
+            </version>
+
+        </dependency>
+
+
+        <!-- ================================================= -->
+        <!-- JUNIT -->
+        <!-- ================================================= -->
+
+        <dependency>
+
+            <groupId>
+                org.junit.jupiter
+            </groupId>
+
+            <artifactId>
+                junit-jupiter-api
+            </artifactId>
+
+            <scope>
+                test
+            </scope>
+
+        </dependency>
+
+
+        <dependency>
+
+            <groupId>
+                org.junit.jupiter
+            </groupId>
+
+            <artifactId>
+                junit-jupiter-params
+            </artifactId>
+
+            <scope>
+                test
+            </scope>
+
+        </dependency>
+
+
+        <dependency>
+
+            <groupId>
+                org.junit.jupiter
+            </groupId>
+
+            <artifactId>
+                junit-jupiter-engine
+            </artifactId>
+
+            <scope>
+                test
+            </scope>
+
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!-- ================================================== -->
+    <!-- BUILD -->
+    <!-- ================================================== -->
+
+    <build>
+
+        <plugins>
+
+
+            <!-- ================================================= -->
+            <!-- JAVA COMPILER -->
+            <!-- ================================================= -->
+
+            <plugin>
+
+                <groupId>
+                    org.apache.maven.plugins
+                </groupId>
+
+                <artifactId>
+                    maven-compiler-plugin
+                </artifactId>
+
+                <version>
+                    3.13.0
+                </version>
+
+                <configuration>
+
+                    <release>
+                        17
+                    </release>
+
+                </configuration>
+
+            </plugin>
+
+
+            <!-- ================================================= -->
+            <!-- JAVAFX RUNNER -->
+            <!-- ================================================= -->
+
+            <plugin>
+
+                <groupId>
+                    org.openjfx
+                </groupId>
+
+                <artifactId>
+                    javafx-maven-plugin
+                </artifactId>
+
+                <version>
+                    0.0.8
+                </version>
+
+                <configuration>
+
+                    <mainClass>
+                        com.ecosort.app.EcoSortApplication
+                    </mainClass>
+
+                </configuration>
+
+            </plugin>
+
+
+            <!-- ================================================= -->
+            <!-- JUNIT -->
+            <!-- ================================================= -->
+
+            <plugin>
+
+                <groupId>
+                    org.apache.maven.plugins
+                </groupId>
+
+                <artifactId>
+                    maven-surefire-plugin
+                </artifactId>
+
+                <version>
+                    3.3.0
+                </version>
+
+            </plugin>
+
+
+        </plugins>
+
+    </build>
+
+
+</project>

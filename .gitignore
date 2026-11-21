@@ -1,0 +1,38 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Java / Maven
+java/ecosort-core/target/
+
+# IDE
+.vscode/
+.idea/
+
+# Generated results
+results/
+runs/
+
+# Dataset
+data/
+
+# Model weights
+weights/
+*.pt
+
+# Archives
+*.zip
+
+# Cache
+*.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+# Original TACO dataset
+TACO/

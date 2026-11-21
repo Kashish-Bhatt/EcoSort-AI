@@ -1,0 +1,1683 @@
+package com.ecosort.app;
+
+import com.ecosort.inference.InferenceService;
+import com.ecosort.inference.InferenceService.Detection;
+import com.ecosort.inference.InferenceService.InferenceResult;
+
+import java.io.File;
+
+import javafx.application.Application;
+import javafx.concurrent.Task;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+public class EcoSortApplication extends Application {
+
+    private Stage stage;
+    private File selectedImage;
+
+    private final InferenceService inferenceService =
+            new InferenceService();
+
+    private StackPane uploadCard;
+    private VBox emptyUploadView;
+    private HBox selectedImageView;
+
+    private ImageView imagePreview;
+
+    private Label selectedFileName;
+    private Label selectedFileDetails;
+
+    private Button analyzeButton;
+    private Button changeButton;
+    private Button clearButton;
+
+    private Label systemStatus;
+
+    private Label materialValue;
+    private Label purityValue;
+    private Label contaminationValue;
+    private Label confidenceValue;
+
+    private Label compositionText;
+    private Label recommendationText;
+
+    private Label detectionSummary;
+    private Label inferenceTimeLabel;
+
+    private ProgressIndicator progressIndicator;
+
+    private ScrollPane dashboardScroll;
+
+
+    @Override
+    public void start(Stage stage) {
+
+        this.stage = stage;
+
+        BorderPane root = new BorderPane();
+
+        root.setStyle(
+                "-fx-background-color: #F4F7F5;"
+        );
+
+        root.setLeft(
+                createSidebar()
+        );
+
+        BorderPane workspace =
+                new BorderPane();
+
+        workspace.setStyle(
+                "-fx-background-color: #F4F7F5;"
+        );
+
+        workspace.setTop(
+                createHeader()
+        );
+
+        VBox dashboardContent =
+                createDashboardContent();
+
+        dashboardScroll =
+                new ScrollPane(
+                        dashboardContent
+                );
+
+        dashboardScroll.setFitToWidth(true);
+
+        dashboardScroll.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER
+        );
+
+        dashboardScroll.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.ALWAYS
+        );
+
+        dashboardScroll.setPannable(true);
+
+        dashboardScroll.setStyle(
+                "-fx-background: #F4F7F5;"
+                        + "-fx-background-color: #F4F7F5;"
+                        + "-fx-border-color: transparent;"
+        );
+
+        workspace.setCenter(
+                dashboardScroll
+        );
+
+        root.setCenter(
+                workspace
+        );
+
+        Scene scene =
+                new Scene(
+                        root,
+                        1180,
+                        700
+                );
+
+        stage.setTitle(
+                "EcoSort AI - Recycling Quality Controller"
+        );
+
+        stage.setMinWidth(950);
+        stage.setMinHeight(600);
+
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
+    }
+
+
+    // =========================================================
+    // SIDEBAR
+    // =========================================================
+
+    private VBox createSidebar() {
+
+        VBox sidebar =
+                new VBox(16);
+
+        sidebar.setPrefWidth(215);
+        sidebar.setMinWidth(215);
+
+        sidebar.setPadding(
+                new Insets(
+                        28,
+                        18,
+                        22,
+                        18
+                )
+        );
+
+        sidebar.setStyle(
+                "-fx-background-color: #103F30;"
+        );
+
+        Label logo =
+                new Label(
+                        "♻  EcoSort AI"
+                );
+
+        logo.setStyle(
+                "-fx-text-fill: white;"
+                        + "-fx-font-size: 21px;"
+                        + "-fx-font-weight: bold;"
+        );
+
+        Label subtitle =
+                new Label(
+                        "Recycling Intelligence"
+                );
+
+        subtitle.setStyle(
+                "-fx-text-fill: #A9CBBE;"
+                        + "-fx-font-size: 11px;"
+        );
+
+        VBox brand =
+                new VBox(
+                        4,
+                        logo,
+                        subtitle
+                );
+
+        brand.setPadding(
+                new Insets(
+                        0,
+                        0,
+                        18,
+                        0
+                )
+        );
+
+        Button dashboardButton =
+                createSidebarButton(
+                        "Dashboard"
+                );
+
+        Button analyzeMenuButton =
+                createSidebarButton(
+                        "Analyze Waste"
+                );
+
+        Button historyButton =
+                createSidebarButton(
+                        "Analysis History"
+                );
+
+        Button modelButton =
+                createSidebarButton(
+                        "Model Information"
+                );
+
+        Region spacer =
+                new Region();
+
+        VBox.setVgrow(
+                spacer,
+                Priority.ALWAYS
+        );
+
+        Label version =
+                new Label(
+                        "EcoSort AI v1.0"
+                );
+
+        version.setStyle(
+                "-fx-text-fill: #87AA9D;"
+                        + "-fx-font-size: 10px;"
+        );
+
+        sidebar.getChildren().addAll(
+                brand,
+                dashboardButton,
+                analyzeMenuButton,
+                historyButton,
+                modelButton,
+                spacer,
+                version
+        );
+
+        dashboardButton.setOnAction(
+                event -> {
+
+                    if (dashboardScroll != null) {
+                        dashboardScroll.setVvalue(0);
+                    }
+                }
+        );
+
+        analyzeMenuButton.setOnAction(
+                event -> {
+
+                    if (dashboardScroll != null) {
+                        dashboardScroll.setVvalue(0);
+                    }
+
+                    if (selectedImage == null) {
+                        chooseImage();
+                    } else {
+                        analyzeSelectedImage();
+                    }
+                }
+        );
+
+        historyButton.setOnAction(
+                event ->
+                        showInformation(
+                                "Analysis History",
+                                "Analysis history will be "
+                                        + "implemented as a full page "
+                                        + "after the inference dashboard "
+                                        + "is finalized."
+                        )
+        );
+
+        modelButton.setOnAction(
+                event ->
+                        showInformation(
+                                "Model Information",
+                                "Current local model: "
+                                        + "YOLO11s, 960 px.\n\n"
+                                        + "The final page will show "
+                                        + "architecture, metrics, "
+                                        + "class performance and speed."
+                        )
+        );
+
+        return sidebar;
+    }
+
+
+    // =========================================================
+    // HEADER
+    // =========================================================
+
+    private HBox createHeader() {
+
+        Label title =
+                new Label(
+                        "Waste Analysis Dashboard"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 25px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #143B30;"
+        );
+
+        Label description =
+                new Label(
+                        "AI-powered waste detection, "
+                                + "segmentation and recycling "
+                                + "quality analysis"
+                );
+
+        description.setStyle(
+                "-fx-font-size: 12px;"
+                        + "-fx-text-fill: #6A7D76;"
+        );
+
+        VBox heading =
+                new VBox(
+                        4,
+                        title,
+                        description
+                );
+
+        systemStatus =
+                new Label(
+                        "●  SYSTEM READY"
+                );
+
+        setReadyStatus();
+
+        Region spacer =
+                new Region();
+
+        HBox.setHgrow(
+                spacer,
+                Priority.ALWAYS
+        );
+
+        HBox header =
+                new HBox(
+                        heading,
+                        spacer,
+                        systemStatus
+                );
+
+        header.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        header.setPadding(
+                new Insets(
+                        22,
+                        30,
+                        18,
+                        30
+                )
+        );
+
+        return header;
+    }
+
+
+    // =========================================================
+    // DASHBOARD
+    // =========================================================
+
+    private VBox createDashboardContent() {
+
+        uploadCard =
+                createUploadCard();
+
+        HBox resultCards =
+                createResultCards();
+
+        VBox detectionPanel =
+                createDetectionPanel();
+
+        VBox compositionPanel =
+                createCompositionPanel();
+
+        VBox recommendationPanel =
+                createRecommendationPanel();
+
+        Region bottomSpace =
+                new Region();
+
+        bottomSpace.setPrefHeight(35);
+
+        VBox dashboard =
+                new VBox(
+                        16,
+                        uploadCard,
+                        resultCards,
+                        detectionPanel,
+                        compositionPanel,
+                        recommendationPanel,
+                        bottomSpace
+                );
+
+        dashboard.setPadding(
+                new Insets(
+                        0,
+                        28,
+                        25,
+                        28
+                )
+        );
+
+        dashboard.setFillWidth(true);
+
+        return dashboard;
+    }
+
+
+    // =========================================================
+    // UPLOAD CARD
+    // =========================================================
+
+    private StackPane createUploadCard() {
+
+        emptyUploadView =
+                createEmptyUploadView();
+
+        selectedImageView =
+                createSelectedImageView();
+
+        selectedImageView.setVisible(false);
+        selectedImageView.setManaged(false);
+
+        StackPane card =
+                new StackPane(
+                        emptyUploadView,
+                        selectedImageView
+                );
+
+        card.setMinHeight(220);
+        card.setPrefHeight(220);
+
+        card.setPadding(
+                new Insets(18)
+        );
+
+        card.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-background-radius: 14;"
+                        + "-fx-border-color: #D7E3DE;"
+                        + "-fx-border-radius: 14;"
+        );
+
+        card.setOnDragOver(
+                event -> {
+
+                    Dragboard board =
+                            event.getDragboard();
+
+                    if (
+                            board.hasFiles()
+                                    && isValidImage(
+                                    board.getFiles()
+                                            .get(0)
+                            )
+                    ) {
+
+                        event.acceptTransferModes(
+                                TransferMode.COPY
+                        );
+                    }
+
+                    event.consume();
+                }
+        );
+
+        card.setOnDragDropped(
+                event -> {
+
+                    Dragboard board =
+                            event.getDragboard();
+
+                    boolean success = false;
+
+                    if (
+                            board.hasFiles()
+                                    && isValidImage(
+                                    board.getFiles()
+                                            .get(0)
+                            )
+                    ) {
+
+                        loadImage(
+                                board.getFiles()
+                                        .get(0)
+                        );
+
+                        success = true;
+                    }
+
+                    event.setDropCompleted(
+                            success
+                    );
+
+                    event.consume();
+                }
+        );
+
+        return card;
+    }
+
+
+    private VBox createEmptyUploadView() {
+
+        Label icon =
+                new Label("♻");
+
+        icon.setStyle(
+                "-fx-font-size: 38px;"
+                        + "-fx-text-fill: #23785A;"
+        );
+
+        Label title =
+                new Label(
+                        "Upload a waste image"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 17px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #1E3C32;"
+        );
+
+        Label text =
+                new Label(
+                        "Drag and drop a JPG, JPEG or PNG "
+                                + "image here, or select one "
+                                + "from your computer."
+                );
+
+        text.setStyle(
+                "-fx-font-size: 11px;"
+                        + "-fx-text-fill: #71837C;"
+        );
+
+        Button chooseButton =
+                createPrimaryButton(
+                        "Choose Image"
+                );
+
+        chooseButton.setOnAction(
+                event -> chooseImage()
+        );
+
+        VBox box =
+                new VBox(
+                        9,
+                        icon,
+                        title,
+                        text,
+                        chooseButton
+                );
+
+        box.setAlignment(
+                Pos.CENTER
+        );
+
+        return box;
+    }
+
+
+    private HBox createSelectedImageView() {
+
+        imagePreview =
+                new ImageView();
+
+        imagePreview.setPreserveRatio(true);
+        imagePreview.setFitWidth(390);
+        imagePreview.setFitHeight(180);
+
+        progressIndicator =
+                new ProgressIndicator();
+
+        progressIndicator.setMaxSize(
+                42,
+                42
+        );
+
+        progressIndicator.setVisible(false);
+
+        StackPane imageContainer =
+                new StackPane(
+                        imagePreview,
+                        progressIndicator
+                );
+
+        imageContainer.setPrefWidth(430);
+        imageContainer.setMinWidth(360);
+
+        imageContainer.setStyle(
+                "-fx-background-color: #EDF2EF;"
+                        + "-fx-background-radius: 10;"
+        );
+
+        Label ready =
+                new Label(
+                        "IMAGE READY"
+                );
+
+        ready.setStyle(
+                "-fx-text-fill: #1F7857;"
+                        + "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+        );
+
+        Label title =
+                new Label(
+                        "Ready for EcoSort analysis"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 17px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #1C3C31;"
+        );
+
+        selectedFileName =
+                new Label();
+
+        selectedFileName.setWrapText(true);
+
+        selectedFileName.setStyle(
+                "-fx-font-size: 12px;"
+                        + "-fx-text-fill: #415B51;"
+                        + "-fx-font-weight: bold;"
+        );
+
+        selectedFileDetails =
+                new Label();
+
+        selectedFileDetails.setStyle(
+                "-fx-font-size: 10px;"
+                        + "-fx-text-fill: #7A8C85;"
+        );
+
+        analyzeButton =
+                createPrimaryButton(
+                        "Analyze Waste"
+                );
+
+        changeButton =
+                createSecondaryButton(
+                        "Change Image"
+                );
+
+        clearButton =
+                createSecondaryButton(
+                        "Clear"
+                );
+
+        analyzeButton.setOnAction(
+                event -> analyzeSelectedImage()
+        );
+
+        changeButton.setOnAction(
+                event -> chooseImage()
+        );
+
+        clearButton.setOnAction(
+                event -> clearImage()
+        );
+
+        HBox buttons =
+                new HBox(
+                        9,
+                        analyzeButton,
+                        changeButton,
+                        clearButton
+                );
+
+        VBox details =
+                new VBox(
+                        7,
+                        ready,
+                        title,
+                        selectedFileName,
+                        selectedFileDetails,
+                        buttons
+                );
+
+        details.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        HBox.setHgrow(
+                details,
+                Priority.ALWAYS
+        );
+
+        HBox selected =
+                new HBox(
+                        22,
+                        imageContainer,
+                        details
+                );
+
+        selected.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        return selected;
+    }
+
+
+    // =========================================================
+    // CARDS
+    // =========================================================
+
+    private HBox createResultCards() {
+
+        materialValue =
+                createValueLabel("—");
+
+        purityValue =
+                createValueLabel("—");
+
+        contaminationValue =
+                createValueLabel("—");
+
+        confidenceValue =
+                createValueLabel("—");
+
+        VBox material =
+                createResultCard(
+                        "PRIMARY MATERIAL",
+                        materialValue,
+                        "Highest-confidence class"
+                );
+
+        VBox purity =
+                createResultCard(
+                        "PURITY SCORE",
+                        purityValue,
+                        "Requires segmentation"
+                );
+
+        VBox contamination =
+                createResultCard(
+                        "CONTAMINATION",
+                        contaminationValue,
+                        "Requires segmentation"
+                );
+
+        VBox confidence =
+                createResultCard(
+                        "AI CONFIDENCE",
+                        confidenceValue,
+                        "Prediction certainty"
+                );
+
+        HBox cards =
+                new HBox(
+                        14,
+                        material,
+                        purity,
+                        contamination,
+                        confidence
+                );
+
+        for (VBox card : new VBox[]{
+                material,
+                purity,
+                contamination,
+                confidence
+        }) {
+
+            HBox.setHgrow(
+                    card,
+                    Priority.ALWAYS
+            );
+        }
+
+        return cards;
+    }
+
+
+    // =========================================================
+    // DETECTIONS
+    // =========================================================
+
+    private VBox createDetectionPanel() {
+
+        Label title =
+                new Label(
+                        "Detected Objects"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 15px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #233C33;"
+        );
+
+        detectionSummary =
+                new Label(
+                        "No image has been analyzed yet."
+                );
+
+        detectionSummary.setWrapText(true);
+
+        detectionSummary.setStyle(
+                "-fx-font-size: 11px;"
+                        + "-fx-text-fill: #71837C;"
+        );
+
+        inferenceTimeLabel =
+                new Label();
+
+        inferenceTimeLabel.setStyle(
+                "-fx-font-size: 10px;"
+                        + "-fx-text-fill: #8A9892;"
+        );
+
+        VBox panel =
+                new VBox(
+                        7,
+                        title,
+                        detectionSummary,
+                        inferenceTimeLabel
+                );
+
+        panel.setPadding(
+                new Insets(18)
+        );
+
+        panel.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-background-radius: 12;"
+                        + "-fx-border-color: #DCE5E1;"
+                        + "-fx-border-radius: 12;"
+        );
+
+        return panel;
+    }
+
+
+    // =========================================================
+    // COMPOSITION
+    // =========================================================
+
+    private VBox createCompositionPanel() {
+
+        Label title =
+                new Label(
+                        "Material Composition"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 15px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #233C33;"
+        );
+
+        compositionText =
+                new Label(
+                        "Analyze an image to view "
+                                + "detected material counts."
+                );
+
+        compositionText.setWrapText(true);
+
+        compositionText.setStyle(
+                "-fx-font-size: 11px;"
+                        + "-fx-text-fill: #71837C;"
+        );
+
+        VBox panel =
+                new VBox(
+                        7,
+                        title,
+                        compositionText
+                );
+
+        panel.setPadding(
+                new Insets(18)
+        );
+
+        panel.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-background-radius: 12;"
+                        + "-fx-border-color: #DCE5E1;"
+                        + "-fx-border-radius: 12;"
+        );
+
+        return panel;
+    }
+
+
+    // =========================================================
+    // RECOMMENDATION
+    // =========================================================
+
+    private VBox createRecommendationPanel() {
+
+        Label title =
+                new Label(
+                        "Recycling Recommendation"
+                );
+
+        title.setStyle(
+                "-fx-font-size: 15px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #233C33;"
+        );
+
+        recommendationText =
+                new Label(
+                        "Upload and analyze an image "
+                                + "to receive guidance."
+                );
+
+        recommendationText.setWrapText(true);
+
+        recommendationText.setStyle(
+                "-fx-font-size: 12px;"
+                        + "-fx-text-fill: #687A73;"
+        );
+
+        VBox panel =
+                new VBox(
+                        7,
+                        title,
+                        recommendationText
+                );
+
+        panel.setPadding(
+                new Insets(18)
+        );
+
+        panel.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-background-radius: 12;"
+                        + "-fx-border-color: #DCE5E1;"
+                        + "-fx-border-radius: 12;"
+        );
+
+        return panel;
+    }
+
+
+    // =========================================================
+    // ANALYZE REAL IMAGE
+    // =========================================================
+
+    private void analyzeSelectedImage() {
+
+        if (selectedImage == null) {
+            return;
+        }
+
+        File imageToAnalyze =
+                selectedImage;
+
+        setProcessingState(true);
+
+        Task<InferenceResult> task =
+                new Task<>() {
+
+                    @Override
+                    protected InferenceResult call()
+                            throws Exception {
+
+                        return inferenceService
+                                .analyze(
+                                        imageToAnalyze
+                                );
+                    }
+                };
+
+
+        task.setOnSucceeded(
+                event -> {
+
+                    setProcessingState(false);
+
+                    InferenceResult result =
+                            task.getValue();
+
+                    displayInferenceResult(
+                            result
+                    );
+                }
+        );
+
+
+        task.setOnFailed(
+                event -> {
+
+                    setProcessingState(false);
+
+                    Throwable error =
+                            task.getException();
+
+                    setErrorStatus();
+
+                    showInformation(
+                            "Analysis Failed",
+                            error == null
+                                    ? "Unknown inference error."
+                                    : error.getMessage()
+                    );
+                }
+        );
+
+
+        Thread thread =
+                new Thread(
+                        task,
+                        "ecosort-inference"
+                );
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+
+    // =========================================================
+    // DISPLAY REAL RESULTS
+    // =========================================================
+
+    private void displayInferenceResult(
+            InferenceResult result) {
+
+        materialValue.setText(
+                result.getHighestMaterial()
+        );
+
+        confidenceValue.setText(
+                String.format(
+                        "%.1f%%",
+                        result.getHighestConfidence()
+                                * 100.0
+                )
+        );
+
+
+        // We do not fabricate segmentation metrics.
+        purityValue.setText(
+                "Pending"
+        );
+
+        contaminationValue.setText(
+                "Pending"
+        );
+
+
+        // =============================================
+        // Annotated image
+        // =============================================
+
+        File annotated =
+                new File(
+                        result.getAnnotatedImagePath()
+                );
+
+        if (annotated.exists()) {
+
+            Image image =
+                    new Image(
+                            annotated.toURI()
+                                    .toString(),
+                            false
+                    );
+
+            imagePreview.setImage(
+                    image
+            );
+        }
+
+
+        // =============================================
+        // Detection list
+        // =============================================
+
+        if (result.getDetectionCount() == 0) {
+
+            detectionSummary.setText(
+                    "No recyclable material was "
+                            + "detected above the "
+                            + "confidence threshold."
+            );
+
+            recommendationText.setText(
+                    "UNKNOWN / MANUAL REVIEW: "
+                            + "EcoSort could not identify "
+                            + "a supported material reliably."
+            );
+
+        } else {
+
+            StringBuilder detections =
+                    new StringBuilder();
+
+
+            for (Detection detection
+                    : result.getDetections()) {
+
+                if (detections.length() > 0) {
+                    detections.append("\n");
+                }
+
+                detections.append(
+                        "• "
+                );
+
+                detections.append(
+                        detection.getMaterial()
+                );
+
+                detections.append(
+                        "  —  "
+                );
+
+                detections.append(
+                        String.format(
+                                "%.1f%%",
+                                detection.getConfidence()
+                                        * 100.0
+                        )
+                );
+            }
+
+
+            detectionSummary.setText(
+                    detections.toString()
+            );
+
+
+            updateRecommendation(
+                    result
+            );
+        }
+
+
+        compositionText.setText(
+                "PLASTIC: "
+                        + result.getPlasticCount()
+                        + " detected\n"
+                        + "METAL: "
+                        + result.getMetalCount()
+                        + " detected\n"
+                        + "GLASS: "
+                        + result.getGlassCount()
+                        + " detected\n"
+                        + "PAPER/CARDBOARD: "
+                        + result.getPaperCardboardCount()
+                        + " detected\n\n"
+                        + "Note: object counts are shown "
+                        + "until segmentation-mask area "
+                        + "analysis is connected."
+        );
+
+
+        inferenceTimeLabel.setText(
+                String.format(
+                        "Current pipeline time: %.2f s "
+                                + "(includes model startup)",
+                        result.getInferenceTimeMs()
+                                / 1000.0
+                )
+        );
+
+
+        setCompleteStatus();
+    }
+
+
+    // =========================================================
+    // RECOMMENDATION FROM REAL DETECTION CONFIDENCE
+    // =========================================================
+
+    private void updateRecommendation(
+            InferenceResult result) {
+
+        double confidence =
+                result.getHighestConfidence();
+
+
+        if (confidence < 0.40) {
+
+            recommendationText.setText(
+                    "UNKNOWN / MANUAL REVIEW: "
+                            + "The highest detection confidence "
+                            + "is too low for reliable recycling "
+                            + "guidance."
+            );
+
+            return;
+        }
+
+
+        if (confidence < 0.60) {
+
+            recommendationText.setText(
+                    "LOW-CONFIDENCE RESULT: Possible "
+                            + result.getHighestMaterial()
+                            + " detected. Verify the material "
+                            + "manually before recycling."
+            );
+
+            return;
+        }
+
+
+        recommendationText.setText(
+                result.getHighestMaterial()
+                        + " is the strongest detected material. "
+                        + "Detection confidence is "
+                        + String.format(
+                        "%.1f%%",
+                        confidence * 100.0
+                )
+                        + ". Final purity and contamination "
+                        + "guidance will be calculated from "
+                        + "segmentation-mask area."
+        );
+    }
+
+
+    // =========================================================
+    // PROCESSING STATE
+    // =========================================================
+
+    private void setProcessingState(
+            boolean processing) {
+
+        analyzeButton.setDisable(
+                processing
+        );
+
+        changeButton.setDisable(
+                processing
+        );
+
+        clearButton.setDisable(
+                processing
+        );
+
+        progressIndicator.setVisible(
+                processing
+        );
+
+
+        if (processing) {
+
+            analyzeButton.setText(
+                    "Analyzing..."
+            );
+
+            systemStatus.setText(
+                    "●  AI PROCESSING"
+            );
+
+            systemStatus.setStyle(
+                    "-fx-background-color: #FFF1CC;"
+                            + "-fx-text-fill: #9A6700;"
+                            + "-fx-padding: 7 14;"
+                            + "-fx-background-radius: 18;"
+                            + "-fx-font-size: 10px;"
+                            + "-fx-font-weight: bold;"
+            );
+
+        } else {
+
+            analyzeButton.setText(
+                    "Analyze Waste"
+            );
+        }
+    }
+
+
+    private void setReadyStatus() {
+
+        systemStatus.setText(
+                "●  SYSTEM READY"
+        );
+
+        systemStatus.setStyle(
+                "-fx-background-color: #DDF4E7;"
+                        + "-fx-text-fill: #16794B;"
+                        + "-fx-padding: 7 14;"
+                        + "-fx-background-radius: 18;"
+                        + "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+        );
+    }
+
+
+    private void setCompleteStatus() {
+
+        systemStatus.setText(
+                "●  ANALYSIS COMPLETE"
+        );
+
+        systemStatus.setStyle(
+                "-fx-background-color: #DDF4E7;"
+                        + "-fx-text-fill: #16794B;"
+                        + "-fx-padding: 7 14;"
+                        + "-fx-background-radius: 18;"
+                        + "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+        );
+    }
+
+
+    private void setErrorStatus() {
+
+        systemStatus.setText(
+                "●  ANALYSIS ERROR"
+        );
+
+        systemStatus.setStyle(
+                "-fx-background-color: #FDE2E2;"
+                        + "-fx-text-fill: #A12626;"
+                        + "-fx-padding: 7 14;"
+                        + "-fx-background-radius: 18;"
+                        + "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+        );
+    }
+
+
+    // =========================================================
+    // IMAGE HANDLING
+    // =========================================================
+
+    private void chooseImage() {
+
+        FileChooser chooser =
+                new FileChooser();
+
+        chooser.setTitle(
+                "Select Waste Image"
+        );
+
+        chooser.getExtensionFilters()
+                .add(
+                        new FileChooser.ExtensionFilter(
+                                "Image Files",
+                                "*.jpg",
+                                "*.jpeg",
+                                "*.png"
+                        )
+                );
+
+        File file =
+                chooser.showOpenDialog(
+                        stage
+                );
+
+        if (file != null) {
+            loadImage(file);
+        }
+    }
+
+
+    private void loadImage(
+            File file) {
+
+        if (!isValidImage(file)) {
+
+            showInformation(
+                    "Unsupported File",
+                    "Please select a JPG, JPEG "
+                            + "or PNG image."
+            );
+
+            return;
+        }
+
+
+        Image image =
+                new Image(
+                        file.toURI()
+                                .toString(),
+                        false
+                );
+
+
+        if (image.isError()) {
+
+            showInformation(
+                    "Image Error",
+                    "EcoSort could not open "
+                            + "this image."
+            );
+
+            return;
+        }
+
+
+        selectedImage =
+                file;
+
+        imagePreview.setImage(
+                image
+        );
+
+        selectedFileName.setText(
+                file.getName()
+        );
+
+        selectedFileDetails.setText(
+                String.format(
+                        "%.0f × %.0f px   •   %.1f KB",
+                        image.getWidth(),
+                        image.getHeight(),
+                        file.length() / 1024.0
+                )
+        );
+
+
+        emptyUploadView.setVisible(false);
+        emptyUploadView.setManaged(false);
+
+        selectedImageView.setVisible(true);
+        selectedImageView.setManaged(true);
+
+        resetResults();
+        setReadyStatus();
+    }
+
+
+    private void clearImage() {
+
+        selectedImage = null;
+
+        imagePreview.setImage(null);
+
+        selectedImageView.setVisible(false);
+        selectedImageView.setManaged(false);
+
+        emptyUploadView.setVisible(true);
+        emptyUploadView.setManaged(true);
+
+        resetResults();
+        setReadyStatus();
+    }
+
+
+    private boolean isValidImage(
+            File file) {
+
+        if (
+                file == null
+                        || !file.isFile()
+        ) {
+            return false;
+        }
+
+        String name =
+                file.getName()
+                        .toLowerCase();
+
+        return name.endsWith(".jpg")
+                || name.endsWith(".jpeg")
+                || name.endsWith(".png");
+    }
+
+
+    private void resetResults() {
+
+        materialValue.setText("—");
+        purityValue.setText("—");
+        contaminationValue.setText("—");
+        confidenceValue.setText("—");
+
+        detectionSummary.setText(
+                "No image has been analyzed yet."
+        );
+
+        inferenceTimeLabel.setText("");
+
+        compositionText.setText(
+                "Analyze an image to view "
+                        + "detected material counts."
+        );
+
+        recommendationText.setText(
+                "Upload and analyze an image "
+                        + "to receive guidance."
+        );
+    }
+
+
+    // =========================================================
+    // COMPONENT HELPERS
+    // =========================================================
+
+    private Button createSidebarButton(
+            String text) {
+
+        Button button =
+                new Button(text);
+
+        button.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        button.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        button.setStyle(
+                "-fx-background-color: transparent;"
+                        + "-fx-text-fill: #DDEAE4;"
+                        + "-fx-font-size: 13px;"
+                        + "-fx-padding: 10 13;"
+                        + "-fx-cursor: hand;"
+        );
+
+        return button;
+    }
+
+
+    private Button createPrimaryButton(
+            String text) {
+
+        Button button =
+                new Button(text);
+
+        button.setStyle(
+                "-fx-background-color: #1F7657;"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-padding: 10 20;"
+                        + "-fx-background-radius: 8;"
+                        + "-fx-cursor: hand;"
+        );
+
+        return button;
+    }
+
+
+    private Button createSecondaryButton(
+            String text) {
+
+        Button button =
+                new Button(text);
+
+        button.setStyle(
+                "-fx-background-color: #E8EFEC;"
+                        + "-fx-text-fill: #315A4A;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-padding: 10 17;"
+                        + "-fx-background-radius: 8;"
+                        + "-fx-cursor: hand;"
+        );
+
+        return button;
+    }
+
+
+    private Label createValueLabel(
+            String value) {
+
+        Label label =
+                new Label(value);
+
+        label.setStyle(
+                "-fx-font-size: 22px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #173D30;"
+        );
+
+        return label;
+    }
+
+
+    private VBox createResultCard(
+            String title,
+            Label value,
+            String description) {
+
+        Label titleLabel =
+                new Label(title);
+
+        titleLabel.setStyle(
+                "-fx-font-size: 10px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-text-fill: #71847C;"
+        );
+
+        Label descriptionLabel =
+                new Label(description);
+
+        descriptionLabel.setStyle(
+                "-fx-font-size: 10px;"
+                        + "-fx-text-fill: #899890;"
+        );
+
+        VBox card =
+                new VBox(
+                        7,
+                        titleLabel,
+                        value,
+                        descriptionLabel
+                );
+
+        card.setPadding(
+                new Insets(16)
+        );
+
+        card.setMinWidth(150);
+
+        card.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        card.setMinHeight(105);
+
+        card.setStyle(
+                "-fx-background-color: white;"
+                        + "-fx-background-radius: 12;"
+                        + "-fx-border-color: #DCE5E1;"
+                        + "-fx-border-radius: 12;"
+        );
+
+        return card;
+    }
+
+
+    private void showInformation(
+            String title,
+            String message) {
+
+        Alert alert =
+                new Alert(
+                        Alert.AlertType.INFORMATION
+                );
+
+        alert.setTitle(
+                "EcoSort AI"
+        );
+
+        alert.setHeaderText(
+                title
+        );
+
+        alert.setContentText(
+                message
+        );
+
+        alert.showAndWait();
+    }
+
+
+    public static void main(
+            String[] args) {
+
+        launch(args);
+    }
+}
