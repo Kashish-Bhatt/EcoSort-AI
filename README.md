@@ -10,73 +10,92 @@ The current system supports four recyclable material classes:
 
 ---
 
-## 🖥️ Application
+## Application Preview
 
-EcoSort provides a JavaFX interface where users can upload a waste image and view the results of the detection and segmentation pipeline.
+### EcoSort V2 Dashboard
 
-<p align="center">
-  <img src="docs/images/ecosort_gui_main.png" alt="EcoSort AI Application" width="850">
-</p>
+EcoSort provides a JavaFX-based interface for recyclable material analysis using object detection and instance segmentation.
 
-The application displays the final material decision only after the detection and segmentation stages have been evaluated.
+![EcoSort V2 Dashboard](docs/images/ecosort_v2_dashboard.png)
 
-<p align="center">
-  <img src="docs/images/ecosort_gui_results.png" alt="EcoSort AI Analysis Results" width="850">
-</p>
+### Waste Analysis Result
 
-The interface reports:
+The application combines YOLO11s object detection with YOLO11s-seg instance segmentation to estimate the dominant material, purity, contamination and detection confidence.
 
-- detected waste objects
-- detection confidence
-- primary material
-- material composition
-- purity score
-- contamination percentage
-- model decision
-- recycling recommendation
-- inference time
-- analysis history
+![EcoSort V2 Analysis Result](docs/images/ecosort_v2_analysis_result.png)
 
----
+### Model Information
 
-## 🧠 System Architecture
+The Model Information section summarizes the dataset, architecture, held-out evaluation results, IoU analysis and model limitations.
 
-<p align="center">
-  <img src="docs/images/ecosort_architecture.png" alt="EcoSort AI System Architecture" width="850">
-</p>
+![EcoSort V2 Model Information](docs/images/ecosort_v2_model_info_1.png)
+
+![EcoSort V2 Model Evaluation](docs/images/ecosort_v2_model_info_2.png)
+
+## EcoSort V2
+
+EcoSort V2 expands the original TACO-derived dataset using Segmented TrashNet while preserving the original 219-image held-out test set for direct V1 vs V2 evaluation.
+
+### V2 Dataset
+
+- Training images: 2,636
+- Training annotations: 4,120
+- Validation images: 675
+- Validation annotations: 956
+- Test images: 219
+- Test annotations: 488
+- Classes: Plastic, Metal, Glass, Paper/Cardboard
+
+### V1 vs V2 Evaluation
+
+| Metric | V1 | V2 |
+|---|---:|---:|
+| Detection Precision | 47.8% | 35.14% |
+| Detection Recall | 30.1% | 36.39% |
+| Detection mAP@50 | 26.6% | 32.20% |
+| Detection mAP@50-95 | 20.2% | 25.38% |
+| Segmentation Mask Precision | 32.4% | 38.7% |
+| Segmentation Mask Recall | 32.4% | 31.2% |
+| Segmentation Mask mAP@50 | 21.0% | 29.4% |
+| Segmentation Mask mAP@50-95 | 14.5% | 20.2% |
+| Global IoU | 39.71% | 42.17% |
+| Mean Image IoU | 37.47% | 42.48% |
+
+V2 improved detection recall and both detection mAP metrics. Segmentation also achieved higher mask precision, mask mAP, Global IoU and Mean Image IoU.
+
+Performance gains were not uniform across all classes. Glass remains the most difficult class, particularly because transparent and reflective objects are visually challenging. EcoSort therefore uses cross-model verification and routes unreliable or conflicting predictions to **Manual Review**.
+
+## Final Architecture
 
 ```text
 Waste Image
-     │
-     ├──────────────────────────┐
-     ▼                          ▼
-YOLO11s Detector          YOLO11s-seg
-960 × 960                 640 × 640
-     │                          │
-Bounding Boxes              Instance Masks
-Class Predictions           Material Areas
-Confidence                       │
-     │                          │
-     └─────────────┬────────────┘
-                   ▼
-            Decision Fusion
-                   │
-        ┌──────────┴──────────┐
-        ▼                     ▼
- Models Agree          Uncertain / Disagree
-        │                     │
-        ▼                     ▼
-Material Result          MANUAL REVIEW
-        │
-        ▼
-JavaFX Application
-        │
-        ├── Purity
-        ├── Contamination
-        ├── Composition
-        ├── Recommendation
-        └── Analysis History
-```
+     |
+     +----------------------+
+     |                      |
+     v                      v
+YOLO11s                YOLO11s-seg
+Detection              Segmentation
+960 px                 640 px
+     |                      |
+     +----------+-----------+
+                |
+                v
+       Cross-Model Verification
+                |
+       +--------+---------+
+       |                  |
+       v                  v
+ Models Agree       Models Disagree /
+                    Low Confidence
+       |                  |
+       v                  v
+Material Result      MANUAL REVIEW
+       |
+       v
+Purity + Contamination
+       |
+       v
+Recycling Recommendation
 
 Python and Ultralytics handle model inference, while Java manages the desktop interface, analysis workflow and history. Communication between the Java and Python components is JSON-based.
 
@@ -582,3 +601,30 @@ Recycling Recommendation
 ```
 
 The project combines deep-learning experimentation with a working Java application for recyclable-material analysis.
+## EcoSort V2
+
+EcoSort V2 expands the original TACO-derived training dataset with
+Segmented TrashNet while preserving the original 219-image held-out
+test set for direct V1 vs V2 comparison.
+
+### V2 Dataset
+
+- Training images: 2,636
+- Training annotations: 4,120
+- Validation images: 675
+- Validation annotations: 956
+- Test images: 219
+- Test annotations: 488
+- Classes: Plastic, Metal, Glass, Paper/Cardboard
+
+### Final V2 Performance
+
+| Metric | V1 | V2 |
+|---|---:|---:|
+| Detection mAP@50 | 26.6% | 32.2% |
+| Detection mAP@50-95 | 20.2% | 25.38% |
+| Detection Recall | 30.1% | 36.39% |
+| Segmentation Mask mAP@50 | 21.0% | 29.4% |
+| Segmentation Mask mAP@50-95 | 14.5% | 20.2% |
+| Global IoU | 39.71% | 42.17% |
+| Mean Image IoU | 37.47% | 42.48% |
